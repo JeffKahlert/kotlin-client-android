@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.kotlin_client_android.presentation.contacts.ContactScreen
 import com.example.kotlin_client_android.presentation.login.LoginScreen
 import com.example.kotlin_client_android.ui.theme.KotlinclientandroidTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,7 +34,12 @@ fun LandingPage() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "login_screen") {
         composable("login_screen") {
-            LoginScreen()
+            LoginScreen(onLoginSuccess = {
+                navController.navigate("contact_screen")
+            })
+        }
+        composable("contact_screen") {
+            ContactScreen()
         }
     }
 }

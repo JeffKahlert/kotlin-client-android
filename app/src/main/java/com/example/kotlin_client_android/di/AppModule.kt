@@ -1,8 +1,13 @@
 package com.example.kotlin_client_android.di
 
+import android.content.Context
+import com.example.kotlin_client_android.data.remote.RemoteUserService
+import com.example.kotlin_client_android.data.remote.RemoteUserServiceImpl
+import com.example.kotlin_client_android.data.repository.UserRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
@@ -33,6 +38,21 @@ object AppModule {
             }
             install(Logging)
         }
+    }
+    @Provides
+    @Singleton
+    fun provideRemoteUserService(client: HttpClient): RemoteUserService {
+        return RemoteUserServiceImpl(client)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserRepository(
+        client: HttpClient,
+        @ApplicationContext context: Context,
+        remoteUserService: RemoteUserService
+    ): UserRepository {
+        return UserRepository(client, context, remoteUserService)
     }
 
 }

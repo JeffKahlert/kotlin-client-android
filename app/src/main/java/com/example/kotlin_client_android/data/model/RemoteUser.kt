@@ -1,7 +1,13 @@
 package com.example.kotlin_client_android.data.model
 
-class RemoteUser(
-    id: String, name: String
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
+import org.whispersystems.libsignal.state.PreKeyBundle
 
-) : BaseUser(id, name) {
+@Serializable
+class RemoteUser(
+    val userId: String,
+    val userName: String,
+    @Contextual val preKeyBundle: PreKeyBundle?,
+) {
 }

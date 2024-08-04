@@ -9,14 +9,13 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
-
+    onLoginSuccess: () -> Unit
 ) {
     var username by remember { mutableStateOf(TextFieldValue("")) }
-    var password by remember { mutableStateOf(TextFieldValue("")) }
+    var deviceId by remember { mutableStateOf(TextFieldValue("")) }
 
     Box(
         modifier = Modifier
@@ -34,9 +33,23 @@ fun LoginScreen(
                 placeholder = { Text("Username") },
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextField(
+                value = deviceId,
+                onValueChange = { deviceId = it },
+                placeholder =  { Text("DeviceId") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
             Button(
                 onClick = {
-                    viewModel.login(username.text)
+                    viewModel.register(
+                        username = username.text,
+                        deviceId = deviceId.text.toInt(),
+                    )
+                    onLoginSuccess()
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
