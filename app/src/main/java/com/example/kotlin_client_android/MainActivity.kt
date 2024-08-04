@@ -32,12 +32,12 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun LandingPage() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "login_screen") {
-        composable("login_screen") {
+    NavHost(navController = navController, startDestination = "contact_screen") {
+        /*composable("login_screen") {
             LoginScreen(onLoginSuccess = {
                 navController.navigate("contact_screen")
             })
-        }
+        }*/
         composable("contact_screen") {
             ContactScreen()
         }

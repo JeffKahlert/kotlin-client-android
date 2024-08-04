@@ -51,7 +51,6 @@ class UserRepository @Inject constructor(
     @OptIn(InternalAPI::class)
     suspend fun sendPreKeyBundle(user: DeviceUser): Boolean {
         val jsonData = Json.encodeToString(user.getSenderKeyBundle())
-        println("JSONDATA: $jsonData")
         return try {
             val response: HttpResponse = client.post("${Constants.BASE_URL}/keys") {
                 contentType(ContentType.Application.Json)

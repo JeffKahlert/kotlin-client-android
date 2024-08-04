@@ -50,8 +50,6 @@ class DeviceUser(val name: String,val deviceId: Int) {
                 preKeys.forEach {
                     //store.storePreKey(it.id, it)
                     preKeyStore.storePreKey(it.id, it)
-                    println("PREKEY IDs: ${it.id}")
-                    println("LOAD PRE KEY WITH ID ${it.id}: ${it.serialize()}")
                 }
             }
 
