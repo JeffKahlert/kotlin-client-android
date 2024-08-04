@@ -1,0 +1,1 @@
+This is the Android client for my ktor-chap-server project, which I am developing as part of my bachelor thesis. The goal is to create an encrypted chat between 2 clients. The Signal Portocol library will be used for encryption 
