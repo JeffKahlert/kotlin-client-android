@@ -1,6 +1,9 @@
 package com.example.kotlin_client_android.data.model
 
 import com.example.kotlin_client_android.data.generator.KeyGenerator
+import com.example.kotlin_client_android.data.model.key.KeyBundleToSend
+import com.example.kotlin_client_android.data.model.key.SerializedPreKey
+import com.example.kotlin_client_android.data.model.key.SerializedSignedPreKeys
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
@@ -16,7 +19,7 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 @Serializable
-class DeviceUser(val name: String,val deviceId: Int) {
+class DeviceUser(private val name: String, private val deviceId: Int) {
 
     private var registrationId: Int = 0
     private lateinit var store: SignalProtocolStore
@@ -68,30 +71,44 @@ class DeviceUser(val name: String,val deviceId: Int) {
     }
 
     @OptIn(ExperimentalEncodingApi::class)
-    fun serializeSignedKeyPublic(): List<String> {
+    fun serializeSignedKeyPublic(): List<SerializedSignedPreKeys> {
+        val serializedSignedPreKeys = mutableListOf<SerializedSignedPreKeys>()
         val signedPreKey = this.signedPreKeyStore.loadSignedPreKeys()
-        return signedPreKey.map { key ->
-            Base64.encode(key.keyPair.publicKey.serialize())
+        signedPreKey.forEach { key ->
+            serializedSignedPreKeys.add(
+                SerializedSignedPreKeys(
+                    key.id.toString(),
+                    Base64.encode(key.keyPair.publicKey.serialize()),
+                    Base64.encode(key.signature),
+                )
+            )
         }
+        return serializedSignedPreKeys
     }
 
     @OptIn(ExperimentalEncodingApi::class)
-    fun serializedPreKeyPublic(): List<String> {
-        val preKeys = mutableListOf<String>()
+    fun serializedPreKeyPublic(): List<SerializedPreKey> {
+        val serializedPreKeys = mutableListOf<SerializedPreKey>()
         for (i in KeyGenerator.PRE_KEY_START until KeyGenerator.PRE_KEY_START + KeyGenerator.PRE_KEY_COUNT) {
             try {
                 val preKey = this.preKeyStore.loadPreKey(i)
-                preKeys.add(Base64.encode(preKey.keyPair.publicKey.serialize()))
+                val preKeyId = this.preKeyStore.loadPreKey(i).id
+                serializedPreKeys.add(
+                    SerializedPreKey(
+                        preKeyId.toString(),
+                        Base64.encode(preKey.keyPair.publicKey.serialize()))
+                    )
             } catch (e: InvalidKeyIdException) {
                 // PreKey mit dieser ID existiert nicht, überspringen
                 println("PreKey with ID $i does not exist: ${e.message}")
             }
         }
-        return preKeys
+        return serializedPreKeys
     }
 
     fun getSenderKeyBundle() = KeyBundleToSend(
         this.name,
+        this.deviceId,
         this.registrationId,
         serializeIdentityKeyPublic(),
         serializedPreKeyPublic(),

@@ -7,7 +7,6 @@ import org.whispersystems.libsignal.state.PreKeyBundle
 
 @Serializable
 class RemoteUser(
-    //@SerialName("_id") val id: String,
     val userId: String,
     val userName: String,
     val preKeyBundle: RemoteUserPreKeyBundle
@@ -15,7 +14,6 @@ class RemoteUser(
 
     fun toRemoteUser(): RemoteUser {
         return RemoteUser(
-            //id = id,
             userId = userId,
             userName = userName,
             preKeyBundle = preKeyBundle

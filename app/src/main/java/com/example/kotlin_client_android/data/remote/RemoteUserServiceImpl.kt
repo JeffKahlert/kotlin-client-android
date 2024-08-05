@@ -26,6 +26,7 @@ class RemoteUserServiceImpl(
         return RemoteUser("0000", "False",
             RemoteUserPreKeyBundle(
             "",
+                "",
             "",
             "",
             emptyList(),
