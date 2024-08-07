@@ -55,4 +55,9 @@ object AppModule {
         return UserRepository(client, context, remoteUserService)
     }
 
+
+    @Provides
+    fun provideContext(@ApplicationContext context: Context): Context {
+        return context
+    }
 }

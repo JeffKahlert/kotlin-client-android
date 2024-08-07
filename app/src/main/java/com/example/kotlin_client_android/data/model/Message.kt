@@ -4,7 +4,10 @@ import kotlinx.serialization.Serializable
 
 
 class Message(
+    val chatId: String,
+    val senderId: String,
+    val receiverId: String,
     val content: String,
-    val userId: String,
+    val timestamp: Long = System.currentTimeMillis()
 ) {
 }

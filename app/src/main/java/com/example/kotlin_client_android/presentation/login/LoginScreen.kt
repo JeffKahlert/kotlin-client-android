@@ -53,7 +53,7 @@ fun LoginScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Login")
+                Text("SignUp")
             }
         }
     }

@@ -22,15 +22,25 @@ class RemoteUserServiceImpl(
         }
     }
 
-    override suspend fun getUserById(): RemoteUser {
-        return RemoteUser("0000", "False",
-            RemoteUserPreKeyBundle(
-            "",
-                "",
-            "",
-            "",
-            emptyList(),
-            emptyList())
-        )
+
+    override suspend fun getUserById(id: String): Result<RemoteUser> {
+        return try {
+            val allUsers = client.get("${Constants.BASE_URL}/user")
+                .body<List<RemoteUser>>()
+                .map { it.toRemoteUser() }
+
+            val user = allUsers.find { it.userId == id }
+
+            if (user != null) {
+                Result.success(user)
+            } else {
+                Result.failure(Exception("User not found"))
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            println("ENDPOINT ${RemoteUserService.Endpoints.GetAllUsers}")
+            println("ERROR BEIM LADEN DER USER: ${ex.message}")
+            Result.failure(ex)
+        }
     }
 }

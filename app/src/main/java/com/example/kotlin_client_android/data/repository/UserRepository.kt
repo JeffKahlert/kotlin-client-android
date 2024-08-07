@@ -27,7 +27,7 @@ class UserRepository @Inject constructor(
 
     companion object {
         private const val PREFS_NAME = "user_prefs"
-        private const val KEY_USERNAME = "username"
+        private const val KEY_USERID = "0"
     }
 
     private val sharedPreferences: SharedPreferences
@@ -35,7 +35,7 @@ class UserRepository @Inject constructor(
 
 
     fun createUser(name: String, deviceId: Int): DeviceUser {
-        //saveUsername(name)
+        saveUsername(deviceId)
         return DeviceUser(name, deviceId)
     }
 
@@ -64,11 +64,20 @@ class UserRepository @Inject constructor(
     }
 
 
-    private fun saveUsername(username: String) {
-        sharedPreferences.edit().putString(KEY_USERNAME, username).apply()
+    private fun saveUsername(deviceId: Int) {
+        val sharedPref = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString("device_id", deviceId.toString())
+            apply()
+        }
     }
 
     fun getUsername(): String? {
-        return sharedPreferences.getString(KEY_USERNAME, null)
+        return sharedPreferences.getString(KEY_USERID, null)
+    }
+
+    fun getDeviceId(): String? {
+        val sharedPref = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+        return sharedPref.getString("device_id", null)
     }
 }

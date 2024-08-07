@@ -27,4 +27,15 @@ class ContactViewModel @Inject constructor (
             _remoteUsers.value = remoteUserService.getAllUsers()
         }
     }
+
+    fun printUserInfo(userId: String) {
+        viewModelScope.launch {
+            val result = remoteUserService.getUserById(userId)
+            result.onSuccess { user ->
+                println("User Info: ${user.userId}")
+            }.onFailure { exception ->
+                println("Error fetching user info: ${exception.message}")
+            }
+        }
+    }
 }

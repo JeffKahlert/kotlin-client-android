@@ -7,7 +7,7 @@ interface RemoteUserService {
 
     suspend fun getAllUsers(): List<RemoteUser>
 
-    suspend fun getUserById(): RemoteUser
+    suspend fun getUserById(id: String): Result<RemoteUser>
 
     sealed class Endpoints(val url: String) {
         object GetAllUsers: Endpoints("${Constants.BASE_URL}/user")
