@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.kotlin_client_android.presentation.chat.ChatScreen
 import com.example.kotlin_client_android.presentation.contacts.ContactScreen
 import com.example.kotlin_client_android.presentation.login.LoginScreen
@@ -42,13 +44,19 @@ fun LandingPage(deviceId: String?) {
                 navController.navigate("contact_screen")
             })
         }
-        composable("contact_screen"){
-            ContactScreen(onClickSuccess = {
-                navController.navigate("chat_screen")
+        composable("contact_screen") {
+            ContactScreen(onClickSuccess = { chatId, userId ->
+                navController.navigate("chat_screen/$chatId/$userId")
             })
         }
-        composable("chat_screen"){
-            ChatScreen()
+        composable(
+            route = "chat_screen/{chatId}/{userId}",
+            arguments = listOf(navArgument("chatId") { type = NavType.StringType },
+                navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val chatId = backStackEntry.arguments?.getString("chatId")
+            val userId = backStackEntry.arguments?.getString("userId")
+            ChatScreen(deviceId = chatId, remoteUserId = userId)
         }
     }
 }

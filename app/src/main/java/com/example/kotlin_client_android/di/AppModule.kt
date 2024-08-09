@@ -1,6 +1,10 @@
 package com.example.kotlin_client_android.di
 
 import android.content.Context
+import com.example.kotlin_client_android.data.remote.ChatSocketImpl
+import com.example.kotlin_client_android.data.remote.ChatSocketService
+import com.example.kotlin_client_android.data.remote.MessageService
+import com.example.kotlin_client_android.data.remote.MessageServiceImpl
 import com.example.kotlin_client_android.data.remote.RemoteUserService
 import com.example.kotlin_client_android.data.remote.RemoteUserServiceImpl
 import com.example.kotlin_client_android.data.repository.UserRepository
@@ -59,5 +63,18 @@ object AppModule {
     @Provides
     fun provideContext(@ApplicationContext context: Context): Context {
         return context
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideChatSocketService(client: HttpClient): ChatSocketService {
+        return ChatSocketImpl(client)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMessageService(client: HttpClient): MessageService {
+        return MessageServiceImpl(client)
     }
 }
