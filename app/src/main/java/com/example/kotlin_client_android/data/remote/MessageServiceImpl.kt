@@ -8,6 +8,7 @@ import io.ktor.client.request.get
 class MessageServiceImpl(
     private val client: HttpClient
 ) : MessageService {
+
     override suspend fun getAllMessages(): List<Message> {
         return try{
             client.get("${MessageService.Endpoints.GetAllMessages}").body()
@@ -16,4 +17,14 @@ class MessageServiceImpl(
             emptyList()
         }
     }
+
+    override suspend fun getMessagesByChatId(chatId: String): List<Message> {
+        return try{
+            client.get("${MessageService.Endpoints.GetAllMessages}/${chatId}").body()
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            emptyList()
+        }
+    }
+
 }

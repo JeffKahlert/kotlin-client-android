@@ -33,6 +33,7 @@ class ContactViewModel @Inject constructor (
 
     fun getDeviceId(): String? {
         val sharedPref = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+        println(sharedPref.getString("device_id", null))
         return sharedPref.getString("device_id", null)
     }
 

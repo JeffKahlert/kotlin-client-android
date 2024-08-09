@@ -20,10 +20,9 @@ import com.example.kotlin_client_android.ui.theme.Purple40
 @Composable
 fun ContactScreen(
     viewModel: ContactViewModel = hiltViewModel(),
-    onClickSuccess: (String, String) -> Unit // Übergibt chatId und userId
+    onClickSuccess: (String, String, String) -> Unit // Übergibt chatId und userId
 ) {
     val users by viewModel.remoteUsers.collectAsState()
-
 
     Scaffold(
         topBar = {
@@ -45,8 +44,8 @@ fun ContactScreen(
             items(users) { user ->
                 UserCard(user = user, onClick = {
                     val deviceId = viewModel.getDeviceId()
-                    val chatId = "$deviceId${user.userId}" // Generiere die ChatId
-                    onClickSuccess(chatId, user.userId)
+                    val chatId = "$deviceId${user.userId}"
+                    onClickSuccess(chatId, deviceId.toString() , user.userId)
                 })
                 Spacer(modifier = Modifier.height(8.dp))
             }

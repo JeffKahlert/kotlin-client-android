@@ -7,6 +7,8 @@ interface MessageService {
 
     suspend fun getAllMessages(): List<Message>
 
+    suspend fun getMessagesByChatId(chatId: String): List<Message>
+
     sealed class Endpoints(val url: String) {
         object GetAllMessages: Endpoints("${Constants.BASE_URL}/messages")
     }

@@ -33,9 +33,9 @@ class ChatViewModel @Inject constructor(
     val toastEvent = _toastEvent.asSharedFlow()
 
     fun connectChat() {
-        getAllMessages()
         val chatId = savedStateHandle.get<String>("chatId")
         val userId = savedStateHandle.get<String>("userId")
+        getAllMessages(chatId.toString())
         if (chatId != null && userId != null) {
             viewModelScope.launch {
                 val result = chatSocketService.init(chatId, userId)
@@ -75,10 +75,10 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun getAllMessages() {
+    private fun getAllMessages(chatId: String) {
         viewModelScope.launch {
             _state.value = state.value.copy(isLoading = true)
-            val result = messageService.getAllMessages()
+            val result = messageService.getMessagesByChatId(chatId)
             _state.value = state.value.copy(
                 messages = result,
                 isLoading = false

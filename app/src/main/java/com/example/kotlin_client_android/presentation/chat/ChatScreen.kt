@@ -79,7 +79,7 @@ fun ChatScreen(
                     Column(
                         modifier = Modifier
                             .background(
-                                color = if (isOwnMessage) Color.Green else Color.DarkGray,
+                                color = if (isOwnMessage) Color.Green else Color.LightGray,
                                 shape = RoundedCornerShape(20.dp)
                             )
                             .padding(12.dp)

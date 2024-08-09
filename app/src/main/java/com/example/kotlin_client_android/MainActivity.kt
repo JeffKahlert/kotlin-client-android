@@ -45,7 +45,7 @@ fun LandingPage(deviceId: String?) {
             })
         }
         composable("contact_screen") {
-            ContactScreen(onClickSuccess = { chatId, userId ->
+            ContactScreen(onClickSuccess = { chatId, deviceId, userId ->
                 navController.navigate("chat_screen/$chatId/$userId")
             })
         }
@@ -55,8 +55,9 @@ fun LandingPage(deviceId: String?) {
                 navArgument("userId") { type = NavType.StringType })
         ) { backStackEntry ->
             val chatId = backStackEntry.arguments?.getString("chatId")
-            val userId = backStackEntry.arguments?.getString("userId")
-            ChatScreen(deviceId = chatId, remoteUserId = userId)
+            val userId = backStackEntry.arguments?.getString("chatId")?.first()
+            val remoteUserId = backStackEntry.arguments?.getString("chatId")?.last()
+            ChatScreen(deviceId = userId.toString(), remoteUserId = remoteUserId.toString())
         }
     }
 }
