@@ -76,7 +76,6 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun getAllMessages(chatId: String) {
-
         viewModelScope.launch {
             _state.value = state.value.copy(isLoading = true)
             val result = messageService.getMessagesByChatId(chatId)

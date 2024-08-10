@@ -68,12 +68,6 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideChatSocketService(client: HttpClient): ChatSocketService {
-        return ChatSocketImpl(client)
-    }
-
-    @Provides
-    @Singleton
     fun provideMessageService(client: HttpClient): MessageService {
         return MessageServiceImpl(client)
     }

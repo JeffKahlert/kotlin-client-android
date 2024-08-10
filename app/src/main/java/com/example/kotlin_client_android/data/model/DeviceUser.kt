@@ -1,5 +1,6 @@
 package com.example.kotlin_client_android.data.model
 
+import android.content.SharedPreferences
 import com.example.kotlin_client_android.data.generator.KeyGenerator
 import com.example.kotlin_client_android.data.model.key.KeyBundleToSend
 import com.example.kotlin_client_android.data.model.key.SerializedPreKey
@@ -114,4 +115,24 @@ class DeviceUser(private val name: String, private val deviceId: Int) {
         serializedPreKeyPublic(),
         serializeSignedKeyPublic(),
     )
+
+    fun getAddress(): SignalProtocolAddress? {
+        return this.address
+    }
+
+    fun getSessionStore(): InMemorySessionStore {
+        return this.sessionStore
+    }
+
+    fun getPreKeyStore(): InMemoryPreKeyStore {
+        return this.preKeyStore
+    }
+
+    fun getSignedPreKeyStore(): InMemorySignedPreKeyStore {
+        return this.signedPreKeyStore
+    }
+
+    fun getIdentityKeyStore(): InMemoryIdentityKeyStore {
+        return this.identityKeyStore
+    }
 }

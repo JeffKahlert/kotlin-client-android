@@ -32,7 +32,9 @@ class LoginViewModel @Inject constructor(
             val user = userRepository.createUser(username, deviceId)
             val success = userRepository.sendPreKeyBundle(user)
             if (success) {
+                userRepository.saveStores(user)
                 println("Keys auf den Server geladen")
+                println("Alle Session Infos in SharedPreferences gespeichert")
             } else {
                 println("Fehler bei Schlüsselübertragung")
             }
