@@ -1,9 +1,7 @@
 package com.example.kotlin_client_android.data.model
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
+import com.example.kotlin_client_android.data.model.key.RemoteUserPreKeyBundle
 import kotlinx.serialization.Serializable
-import org.whispersystems.libsignal.state.PreKeyBundle
 
 @Serializable
 class RemoteUser(

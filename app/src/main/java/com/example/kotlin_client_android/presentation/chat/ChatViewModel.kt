@@ -1,5 +1,6 @@
 package com.example.kotlin_client_android.presentation.chat
 
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.State
 import androidx.lifecycle.SavedStateHandle
@@ -8,20 +9,31 @@ import androidx.lifecycle.viewModelScope
 import com.example.kotlin_client_android.data.remote.ChatSocketService
 import com.example.kotlin_client_android.data.remote.MessageService
 import com.example.kotlin_client_android.data.remote.RemoteUserService
+import com.example.kotlin_client_android.data.signalstore.SessionController
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import org.whispersystems.libsignal.SessionBuilder
+import org.whispersystems.libsignal.SessionCipher
+import org.whispersystems.libsignal.SignalProtocolAddress
+import org.whispersystems.libsignal.state.PreKeyBundle
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val chatSocketService: ChatSocketService,
     private val messageService: MessageService,
-    private val savedStateHandle: SavedStateHandle
+    private val remoteUserService: RemoteUserService,
+    private val savedStateHandle: SavedStateHandle,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    private val sessionController: SessionController = SessionController(context)
+
 
     private val _messageText = mutableStateOf("")
     val messageText: State<String> = _messageText
@@ -35,6 +47,7 @@ class ChatViewModel @Inject constructor(
     fun connectChat() {
         val chatId = savedStateHandle.get<String>("chatId")
         val userId = savedStateHandle.get<String>("userId")
+        initSignalSession(chatId.toString())
         getAllMessages(chatId.toString())
         if (chatId != null && userId != null) {
             viewModelScope.launch {
@@ -57,6 +70,26 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    private fun initSignalSession(chatId: String) {
+        viewModelScope.launch {
+            val result = remoteUserService.getUserById(chatId.last().toString())
+            result.onSuccess { user ->
+                val remotePreKeyBundle = remoteUserService.deserializeFetchedKeys(user.preKeyBundle)
+                val remoteSignalAddress =
+                    SignalProtocolAddress(user.userName, user.preKeyBundle.deviceId.toInt())
+                val sessionBuilder = SessionBuilder(
+                    sessionController.loadSessionStore(),
+                    sessionController.loadPreKeyStore(),
+                    sessionController.loadSignedPreKeyStore(),
+                    sessionController.loadIdentityKeyStore(),
+                    remoteSignalAddress)
+                sessionBuilder.process(remotePreKeyBundle)
+            }.onFailure { exception ->
+                println("Error fetching user info: ${exception.message}")
+            }
+        }
+    }
+
     fun onMessageChange(message: String) {
         _messageText.value = message
     }
@@ -68,9 +101,28 @@ class ChatViewModel @Inject constructor(
     }
 
     fun sendMessage() {
-        viewModelScope.launch {
-            if (messageText.value.isNotBlank()) {
-                chatSocketService.sendMessage(messageText.value)
+        val chatId = savedStateHandle.get<String>("chatId")
+        if (chatId != null) {
+            viewModelScope.launch {
+                val result = remoteUserService.getUserById(chatId.last().toString())
+                result.onSuccess { user ->
+                    val remoteSignalAddress =
+                        SignalProtocolAddress(user.userName, user.preKeyBundle.deviceId.toInt())
+                    if (messageText.value.isNotBlank()) {
+                        val sessionCipher = SessionCipher(
+                            sessionController.loadSessionStore(),
+                            sessionController.loadPreKeyStore(),
+                            sessionController.loadSignedPreKeyStore(),
+                            sessionController.loadIdentityKeyStore(),
+                            remoteSignalAddress
+                        )
+                        val cipherText =
+                            sessionCipher.encrypt(messageText.value.toByteArray()).toString()
+                        chatSocketService.sendMessage(cipherText)
+                    }
+                }.onFailure { exception ->
+                    println("Error : ${exception.message}")
+                }
             }
         }
     }

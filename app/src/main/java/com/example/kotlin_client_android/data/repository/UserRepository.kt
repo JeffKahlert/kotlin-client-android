@@ -43,18 +43,10 @@ class UserRepository @Inject constructor(
 
 
     fun createUser(name: String, deviceId: Int): DeviceUser {
-        saveUsername(deviceId)
+        saveUserDeviceId(deviceId)
         return DeviceUser(name, deviceId)
     }
 
-    suspend fun getUsers(): List<RemoteUser> {
-        return try {
-            remoteUserService.getAllUsers()
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-            emptyList()
-        }
-    }
 
     @OptIn(InternalAPI::class)
     suspend fun sendPreKeyBundle(user: DeviceUser): Boolean {
@@ -72,7 +64,7 @@ class UserRepository @Inject constructor(
     }
 
 
-    private fun saveUsername(deviceId: Int) {
+    private fun saveUserDeviceId(deviceId: Int) {
         val sharedPref = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
             putString("device_id", deviceId.toString())
@@ -94,12 +86,19 @@ class UserRepository @Inject constructor(
             context.getSharedPreferences("Signal_Prefs", Context.MODE_PRIVATE)
         val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
+        // Get DeviceUser name
+        val username: String = user.getDeviceUserName()
+        editor.putString(
+            "username",
+            username
+        )
+
         // Get the Session
         val sessionRecord: SessionRecord = user.getSessionStore().loadSession(user.getAddress())
         val serializedSession: ByteArray = sessionRecord.serialize()
         val encode: String = Base64.encodeToString(serializedSession, Base64.DEFAULT)
 
-        editor.putString("session_" + user.getAddress()?.name, encode)
+        editor.putString("session_$username", encode)
 
 
         // Get all PreKeys from PreKeyStore
@@ -108,7 +107,7 @@ class UserRepository @Inject constructor(
             val preKey = user.getPreKeyStore().loadPreKey(i)
             val preKeyId = preKey.id
             val preKeyPrivate = preKey.keyPair.privateKey.serialize()
-            val preKeyPublic = preKey.keyPair.privateKey.serialize()
+            val preKeyPublic = preKey.keyPair.publicKey.serialize()
 
             editor.putString(
                 "pre_key_private_$preKeyId",
@@ -152,6 +151,7 @@ class UserRepository @Inject constructor(
         // Get identityKeys from IdentityStore
         val identityKeyPrivate = user.getIdentityKeyStore().identityKeyPair.privateKey.serialize()
         val identityKeyPublic = user.getIdentityKeyStore().identityKeyPair.publicKey.serialize()
+        val registrationId = user.getIdentityKeyStore().localRegistrationId
         editor.putString(
             "identity_key_private",
             Base64.encodeToString(identityKeyPrivate, Base64.DEFAULT)
@@ -159,6 +159,10 @@ class UserRepository @Inject constructor(
         editor.putString(
             "identity_key_public",
             Base64.encodeToString(identityKeyPublic, Base64.DEFAULT)
+        )
+        editor.putInt(
+            "registration_id",
+            registrationId
         )
 
         editor.apply()

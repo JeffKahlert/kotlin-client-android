@@ -135,4 +135,8 @@ class DeviceUser(private val name: String, private val deviceId: Int) {
     fun getIdentityKeyStore(): InMemoryIdentityKeyStore {
         return this.identityKeyStore
     }
+
+    fun getDeviceUserName(): String {
+        return this.name
+    }
 }

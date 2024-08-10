@@ -61,6 +61,14 @@ object AppModule {
 
 
     @Provides
+    @Singleton
+    fun provideChatSocketService(
+        client: HttpClient
+    ): ChatSocketService {
+        return ChatSocketImpl(client)
+    }
+
+    @Provides
     fun provideContext(@ApplicationContext context: Context): Context {
         return context
     }

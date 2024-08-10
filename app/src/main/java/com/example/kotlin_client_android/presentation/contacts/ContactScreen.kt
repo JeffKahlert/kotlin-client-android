@@ -1,6 +1,5 @@
 package com.example.kotlin_client_android.presentation.contacts
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,7 +21,7 @@ fun ContactScreen(
     viewModel: ContactViewModel = hiltViewModel(),
     onClickSuccess: (String, String, String) -> Unit // Übergibt chatId und userId
 ) {
-    val users by viewModel.remoteUsers.collectAsState()
+    val remoteUsers by viewModel.remoteUsers.collectAsState()
 
     Scaffold(
         topBar = {
@@ -41,11 +40,11 @@ fun ContactScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            items(users) { user ->
-                UserCard(user = user, onClick = {
+            items(remoteUsers) { remoteUser ->
+                UserCard(user = remoteUser, onClick = {
                     val deviceId = viewModel.getDeviceId()
-                    val chatId = "$deviceId${user.userId}"
-                    onClickSuccess(chatId, deviceId.toString() , user.userId)
+                    val chatId = "$deviceId${remoteUser.userId}"
+                    onClickSuccess(chatId, deviceId.toString() , remoteUser.userId)
                 })
                 Spacer(modifier = Modifier.height(8.dp))
             }
