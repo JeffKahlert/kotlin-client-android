@@ -8,6 +8,7 @@ import com.example.kotlin_client_android.util.Constants
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.util.decodeBase64Bytes
 import org.whispersystems.libsignal.IdentityKey
 import org.whispersystems.libsignal.InvalidKeyException
 import org.whispersystems.libsignal.ecc.Curve
@@ -74,7 +75,9 @@ class RemoteUserServiceImpl(
         signedPreKeys: Array<SerializedSignedPreKeys>
     ): ByteArray {
         val signatureToByteArray =
-            Base64.decode(signedPreKeys[0].signature).toUByteArray().toByteArray()// before signedPreKeys[0].signature.toByteArray()
+            signedPreKeys[0].signature.decodeBase64Bytes()
+        //val signatureToByteArray =
+            //Base64.decode(signedPreKeys[0].signature).toUByteArray().toByteArray()// before signedPreKeys[0].signature.toByteArray()
         return signatureToByteArray
     }
 
@@ -83,7 +86,10 @@ class RemoteUserServiceImpl(
         signedPreKeys: Array<SerializedSignedPreKeys>
     ): ECPublicKey {
         val signedPublicPreKeyToByteArray =
-            Base64.decode(signedPreKeys[0].publicKey).toUByteArray().toByteArray() // before signedPreKeys[0].publicKey.toByteArray()
+            signedPreKeys[0].publicKey.decodeBase64Bytes()
+
+        //val signedPublicPreKeyToByteArray =
+            //Base64.decode(signedPreKeys[0].publicKey).toUByteArray().toByteArray() // before signedPreKeys[0].publicKey.toByteArray()
         val decodeSignedPublicKey: ECPublicKey = Curve.decodePoint(
             signedPublicPreKeyToByteArray, 0
         )
@@ -92,16 +98,18 @@ class RemoteUserServiceImpl(
 
     @OptIn(ExperimentalEncodingApi::class, ExperimentalUnsignedTypes::class)
     private fun deserializePublicPreKey(preKeys: Array<SerializedPreKey>): ECPublicKey {
-        val basePreKey = Base64.decode(preKeys[0].publicKey).toUByteArray().toByteArray()
-        //val preKey = preKeys[0].publicKey.toByteArray(Charsets.UTF_8)
-        //println("Public Key ByteArray: ${preKey.joinToString(",")}")
+        // val basePreKey = Base64.decode(preKeys[0].publicKey).toUByteArray().toByteArray()
+        val basePreKey = preKeys[0].publicKey.decodeBase64Bytes()
+
         val decodePublicPreKey: ECPublicKey = Curve.decodePoint(basePreKey, 0)
         return decodePublicPreKey
     }
 
     @OptIn(ExperimentalEncodingApi::class, ExperimentalUnsignedTypes::class)
     private fun deserializeIdentityKey(identityKey: String): IdentityKey {
-        val identityKeyToByteArray = Base64.decode(identityKey).toUByteArray().toByteArray()// before identityKey.toByteArray()
+        val identityKeyToByteArray = identityKey.decodeBase64Bytes()// before identityKey.toByteArray()
+
+        // val identityKeyToByteArray = Base64.decode(identityKey).toUByteArray().toByteArray()// before identityKey.toByteArray()
         return IdentityKey(identityKeyToByteArray,0)
     }
 

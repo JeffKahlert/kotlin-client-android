@@ -129,6 +129,7 @@ class UserRepository @Inject constructor(
             val signature: ByteArray = key.signature
             val timeStamp: Long = key.timestamp
 
+
             editor.putString(
                 "signed_pre_key_public_$id",
                 Base64.encodeToString(publicKey, Base64.DEFAULT)
